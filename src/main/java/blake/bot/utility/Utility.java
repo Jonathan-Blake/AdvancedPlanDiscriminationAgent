@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Utility {
+
     private Utility() {
     }
 
@@ -273,6 +274,16 @@ public class Utility {
             List<T> ret = new LinkedList<>(fullList);
             ret.remove(itemToRemove);
             return ret;
+        }
+    }
+
+    public static class Probability {
+        private Probability() {
+        }
+
+        public static Double bayes(final Double prior, final double probabilityIfFalse, final double likelihood) {
+            final double v = prior * likelihood;
+            return v / (v + (1 - prior) * probabilityIfFalse);
         }
     }
 }

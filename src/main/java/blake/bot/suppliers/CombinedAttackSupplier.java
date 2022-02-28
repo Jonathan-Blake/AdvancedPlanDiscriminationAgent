@@ -14,6 +14,7 @@ import es.csic.iiia.fabregues.dip.board.Region;
 import es.csic.iiia.fabregues.dip.orders.MTOOrder;
 import es.csic.iiia.fabregues.dip.orders.Order;
 import es.csic.iiia.fabregues.dip.orders.SUPMTOOrder;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -83,8 +84,10 @@ public class CombinedAttackSupplier implements DealGenerator {
                     adjacentUnits.forEach(adjacentUnit -> createOrderCommitment(orderCommitments, mainAttack, finalTarget, adjacentUnit));
                 } while (orderCommitments.size() < Utility.Plans.maxDefensiveValue(target, game, this.enemies));
                 unit = null;
-                BasicDeal newDeal = testPlan(orderCommitments, target);
-                if (newDeal != null) return newDeal;
+                if (orderCommitments.size() > 1) {
+                    BasicDeal newDeal = testPlan(orderCommitments, target);
+                    if (newDeal != null) return newDeal;
+                }
             }
             unit = null;
         }

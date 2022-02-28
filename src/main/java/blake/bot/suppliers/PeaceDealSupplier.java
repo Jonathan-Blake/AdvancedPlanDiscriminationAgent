@@ -13,32 +13,34 @@ import java.util.Iterator;
 import java.util.List;
 
 public class PeaceDealSupplier implements DealGenerator {
-    private final boolean isFirstTurn;
+    private final boolean mutualOrCoalitionPeace;
     private final List<? extends Power> negotiators;
     private final Power me;
     private final Game game;
     private int aliveAllyIndex;
     private final Iterator<BasicDeal> iterator = new BasicDealIterator(this::generatePeaceDeal);
 
-    public PeaceDealSupplier(boolean isFirstTurn, List<? extends Power> negotiators, Power me, Game game) {
-        this.isFirstTurn = isFirstTurn;
+    public PeaceDealSupplier(boolean mutualOrCoalitionPeace, List<? extends Power> negotiators, Power me, Game game) {
+        this.mutualOrCoalitionPeace = mutualOrCoalitionPeace;
         this.negotiators = negotiators;
         this.me = me;
         this.game = game;
     }
 
     private BasicDeal generatePeaceDeal() {
+
         BasicDeal ret = null;
-        if (this.isFirstTurn) {
-            for (Power power : this.negotiators) {
+        if (this.mutualOrCoalitionPeace) {
+            while (aliveAllyIndex < negotiators.size() && ret == null) {
+                Power power = this.negotiators.get(aliveAllyIndex);
                 if (power != this.me) {
                     ret = proposeMutualPeace(this.me, power);
                 }
+                aliveAllyIndex++;
             }
         } else {
             ret = doNotInvadeCoalitionPartners();
         }
-
         return ret;
     }
 
@@ -49,7 +51,7 @@ public class PeaceDealSupplier implements DealGenerator {
         ArrayList<OrderCommitment> randomOrderCommitments;
 
         BasicDeal ret = null;
-        while (aliveAllyIndex < negotiators.size()) {
+        while (aliveAllyIndex < negotiators.size() && ret == null) {
             relevantPowers = new ArrayList<>();
             relevantPowers.add(this.me);
 

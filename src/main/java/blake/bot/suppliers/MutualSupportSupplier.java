@@ -1,6 +1,6 @@
 package blake.bot.suppliers;
 
-import blake.bot.eager.Utility;
+import blake.bot.utility.Utility;
 import ddejonge.bandana.dbraneTactics.DBraneTactics;
 import ddejonge.bandana.dbraneTactics.Plan;
 import ddejonge.bandana.negoProtocol.BasicDeal;
@@ -90,7 +90,7 @@ public class MutualSupportSupplier implements DealGenerator {
                         generateSupport(this.me, unit, adjacentController, adjacentUnit)));
                 BasicDeal deal = new BasicDeal(orderCommitments, Collections.emptyList());
                 Plan newPlan = this.dBraneTactics.determineBestPlan(this.game, this.me, Utility.Lists.append(commitments, deal));
-                if (newPlanIsEqualOrBetter(newPlan)) {
+                if (newPlanIsEqualOrBetter(newPlan) && allyFavours(deal, adjacentController)) {
                     this.logger.logln("Found mutual support : " + deal.getOrderCommitments(), true);
                     ret = deal;
                 } else {
@@ -103,7 +103,7 @@ public class MutualSupportSupplier implements DealGenerator {
         return ret;
     }
 
-    /*
+	/*
         Loop Processing
      */
 
@@ -144,6 +144,12 @@ public class MutualSupportSupplier implements DealGenerator {
     }
 
     private boolean newPlanIsEqualOrBetter(Plan newPlan) {
-        return newPlan != null && Utility.Plans.compare(newPlan, basePlan) > 0;
+        return newPlan != null && Utility.Plans.compare(newPlan, basePlan) >= 1;
+    }
+
+    private boolean allyFavours(BasicDeal deal, Power other) {
+        return Utility.Plans.compare(
+                dBraneTactics.determineBestPlan(this.game, other, new ArrayList<>()),
+                dBraneTactics.determineBestPlan(this.game, other, Collections.singletonList(deal))) >= 0;
     }
 }
