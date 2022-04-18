@@ -1,9 +1,12 @@
 package blake.bot.utility;
 
+import blake.bot.analyser.PlanInfo;
 import ddejonge.bandana.negoProtocol.DMZ;
 import ddejonge.bandana.negoProtocol.OrderCommitment;
 import es.csic.iiia.fabregues.dip.board.Game;
 import es.csic.iiia.fabregues.dip.board.Phase;
+
+import java.util.Objects;
 
 public class DatedObject {
 
@@ -30,6 +33,10 @@ public class DatedObject {
         this.year = game.getYear();
     }
 
+    public DatedObject(PlanInfo planInfo) {
+        this(planInfo.getGame());
+    }
+
     public Phase getPhase() {
         return this.phase;
     }
@@ -41,5 +48,26 @@ public class DatedObject {
     @Override
     public String toString() {
         return String.format("DatedObject{phase=%s, year=%d}", phase, year);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof DatedObject) {
+            return this.equals((DatedObject) obj);
+        }
+        return super.equals(obj);
+    }
+
+    public boolean equals(DatedObject obj) {
+        if (this == obj) {
+            return true;
+        } else {
+            return this.phase == obj.phase && this.year == obj.year;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getPhase(), getYear());
     }
 }

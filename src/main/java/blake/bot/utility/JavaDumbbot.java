@@ -21,16 +21,25 @@ public class JavaDumbbot {
     private HashMap<Province, Integer> competitionValue;
     private HashMap<Region, Float[]> proximity;
     private HashMap<Region, Integer> destinationValue;
+    private boolean calculated;
 
-    public JavaDumbbot(Game game, Power me) {
+    public JavaDumbbot(Game game, Power me, boolean lazyCalculation) {
         this.game = game;
         this.me = me;
-        calculateFactors();
-        initStrCompValues();
-        calculateDestinationValue();
+        this.calculated = false;
+        if (!lazyCalculation) {
+            calculateFactors();
+            initStrCompValues();
+            calculateDestinationValue();
+        }
     }
 
     public Map<Region, Integer> getDestinationValue() {
+        if (!this.calculated) {
+            calculateFactors();
+            initStrCompValues();
+            calculateDestinationValue();
+        }
         return destinationValue;
     }
 
@@ -54,11 +63,9 @@ public class JavaDumbbot {
                 calculateDestinationValue(sprProximityWeights, 1000, 1000);
                 break;
             case WIN:
-                if (this.me.getOwnedSCs().size() > this.me.getControlledRegions().size()) {
-                    calculateWINDestinationValue(removeProximityWeights, 1000);
-                } else {
-                    calculateWINDestinationValue(buildProximityWeights, 1000);
-                }
+                calculateWINDestinationValue(
+                        this.me.getOwnedSCs().size() > this.me.getControlledRegions().size() ? removeProximityWeights : buildProximityWeights,
+                        1000);
                 break;
         }
     }
@@ -74,8 +81,9 @@ public class JavaDumbbot {
             destWeight = destWeight - competitionWeight * this.competitionValue.get(region.getProvince());
             this.destinationValue.put(region, destWeight);
         }
-        List<Region> regions = this.game.getRegions();
-        regions.sort(new DestValueComparator(this.destinationValue));
+        this.calculated = true;
+//        List<Region> regions = this.game.getRegions();
+//        regions.sort(new DestValueComparator(this.destinationValue));
     }
 
     private void calculateWINDestinationValue(int[] proximityWeight, int defenseWeight) {
@@ -255,7 +263,7 @@ public class JavaDumbbot {
         return adjUnitCount;
     }
 
-    class DestValueComparator implements Comparator<Region> {
+    static class DestValueComparator implements Comparator<Region> {
         private final Map<Region, Integer> destinationValue;
 
         public DestValueComparator(Map<Region, Integer> destValue) {

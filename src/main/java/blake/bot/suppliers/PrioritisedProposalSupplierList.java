@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-public class ProposalSupplierList implements DealGenerator {
+public class PrioritisedProposalSupplierList implements DealGenerator {
     private final DealGenerator[] suppliers;
     private Logger logger;
 
@@ -16,14 +16,14 @@ public class ProposalSupplierList implements DealGenerator {
     private final Iterator<BasicDeal> myIterator;
     private Iterator<DealGenerator> supplierIterator;
 
-    public ProposalSupplierList(DealGenerator... suppliers) {
+    public PrioritisedProposalSupplierList(DealGenerator... suppliers) {
         this.suppliers = suppliers;
         this.iter = null;
         myIterator = new BasicDealIterator(this::get);
         supplierIterator = Arrays.stream(suppliers).iterator();
     }
 
-    public ProposalSupplierList(Logger logger, DealGenerator... suppliers) {
+    public PrioritisedProposalSupplierList(Logger logger, DealGenerator... suppliers) {
         this(suppliers);
         this.logger = logger;
     }
